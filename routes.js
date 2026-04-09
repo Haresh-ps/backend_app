@@ -37,9 +37,38 @@ router.post('/auth/login/', (req, res) => {
     });
 });
 
+const validatePasswordComplexity = (password) => {
+    const hasLength = password.length >= 8;
+    const hasUpper = /[A-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    if (!hasLength) return { valid: false, error: "Password must be at least 8 characters long." };
+    if (!hasUpper) return { valid: false, error: "Password must contain at least one uppercase letter." };
+    if (!hasNumber) return { valid: false, error: "Password must contain at least one number." };
+    if (!hasSpecial) return { valid: false, error: "Password must contain at least one special character." };
+    return { valid: true };
+};
+
+const validateEmailFormat = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
 router.post('/auth/signup/', (req, res) => {
     const { username, email, password } = req.body;
     console.log(`Signup attempt: ${username}, ${email}`);
+
+    if (!username || !password) {
+        return res.status(400).json({ error: "Username and password are required" });
+    }
+
+    if (email && !validateEmailFormat(email)) {
+        return res.status(400).json({ error: "Please enter a valid email address (e.g., example@gmail.com)" });
+    }
+
+    const validation = validatePasswordComplexity(password);
+    if (!validation.valid) {
+        return res.status(400).json({ error: validation.error });
+    }
 
     db.run(`INSERT INTO users (username, email, password) VALUES (?, ?, ?)`,
         [username, email, password],

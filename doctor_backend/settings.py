@@ -56,10 +56,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'doctor_backend.wsgi.application'
 
 # Database
+# https://docs.djangoproject.com/en/stable/ref/settings/#databases
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'dbms',       # Changed from embryo_db to match your MySQL Workbench
+        'USER': 'root',            # Your MySQL username
+        'PASSWORD': '3236',# <--- CHANGE THIS to your actual MySQL password
+        'HOST': '127.0.0.1',       # Or your host
+        'PORT': '3306',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
 }
 
